@@ -4,6 +4,7 @@ import ohm.softa.a12.icndb.JokeGenerator;
 import ohm.softa.a12.model.JokeDto;
 import ohm.softa.a12.model.ResponseWrapper;
 
+import java.util.Objects;
 import java.util.Scanner;
 import java.util.stream.Stream;
 
@@ -29,13 +30,29 @@ public abstract class App {
             jokeCount = readInt("How many jokes do you want?");
             skipCount = readInt("How many jokes do you want to skip");
 
-            Stream<ResponseWrapper<JokeDto>> jokesSource = readJokeSource();
+            // Stream<ResponseWrapper<JokeDto>> jokesSource = readJokeSource();
 
             /* TODO consume the `jokesSource`
              * filter it for non null objects
              * use `skip` and `limit` to retrieve the required elements
              * use `map` to unwrap the ResponseWrapper value
              * and print the jokes to the STDOUT */
+			var jokesSource = readJokeSource();
+
+			jokesSource
+				/* filter null objects */
+				.filter(Objects::nonNull)
+				/* skip requested count of elements */
+				.skip(skipCount)
+				/* limit the infinite stream */
+				.limit(jokeCount)
+				/* unwrap the ResponseWrapper */
+				.map(ResponseWrapper::getValue)
+				/* unwrap the joke String */
+				.map(JokeDto::getJoke)
+				/* print joke to STDOUT */
+				.forEach(System.out::println);
+
 
             System.out.println("If you want to quit press [Q] otherwise press [C] to continue.");
             var input = inputScanner.next();
